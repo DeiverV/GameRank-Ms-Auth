@@ -4,7 +4,7 @@ import { join } from 'path';
 export const grpcClientOptions: ClientOptions = {
   transport: Transport.GRPC,
   options: {
-    package: 'products',
+    package: 'auth',
     protoPath: join(__dirname, 'proto/auth.proto'),
     url: 'localhost:50051',
   },

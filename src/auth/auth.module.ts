@@ -4,7 +4,6 @@ import { AuthService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
-// import { ClientsModule } from '@nestjs/microservices';
 
 @Module({
   imports: [
@@ -13,9 +12,6 @@ import { JwtStrategy } from './jwt.strategy';
       signOptions: { expiresIn: '1h' },
     }),
     PassportModule,
-    // ClientsModule.register({
-    //   name: 'AUTH_SERVICE',
-    // })
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],

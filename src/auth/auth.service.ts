@@ -1,11 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { LoginDto } from './dto';
+import { CreateUserDto, LoginDto } from './dto';
 import { JwtSignature } from './models';
 
 @Injectable()
 export class AuthService {
   constructor(private readonly jwtService: JwtService) {}
+
+  validateToken({ token }: { token: string }) {
+    return this.jwtService.verify(token);
+  }
 
   login({ password, username }: LoginDto) {
     // get user from users ms
@@ -20,5 +24,9 @@ export class AuthService {
     return {
       token: this.jwtService.sign({ user }),
     };
+  }
+
+  register(createUserDto: CreateUserDto) {
+    // get user from users ms UserMS.createUser(createUserDto)
   }
 }

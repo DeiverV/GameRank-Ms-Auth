@@ -21,7 +21,7 @@ export class AuthController {
 
   @GrpcMethod('AuthService', 'ValidateToken')
   @UseGuards(JwtGuard, RolesGuard)
-  validateToken(@Body() { token }: { token: string }) {
+  validateToken({ token }: { token: string }) {
     return this.authService.validateToken({ token });
   }
 

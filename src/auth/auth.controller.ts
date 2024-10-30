@@ -1,13 +1,6 @@
-import {
-  Body,
-  Controller,
-  HttpCode,
-  HttpStatus,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateUserDto, LoginDto } from './dto';
+import { LoginDto } from './dto';
 import { GrpcMethod } from '@nestjs/microservices';
 import { RolesGuard } from './roles.guard';
 import { JwtGuard } from './jwt.guard';
@@ -25,16 +18,8 @@ export class AuthController {
     return this.authService.validateToken({ token });
   }
 
-  //---------- REST Communication
-
-  @Post('login')
-  login(@Body() loginDto: LoginDto) {
+  @GrpcMethod('AuthService', 'Login')
+  login(loginDto: LoginDto) {
     return this.authService.login(loginDto);
-  }
-
-  @Post('register')
-  @HttpCode(HttpStatus.CREATED)
-  register(@Body() createUserDto: CreateUserDto) {
-    this.authService.register(createUserDto);
   }
 }

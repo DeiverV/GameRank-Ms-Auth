@@ -25,8 +25,4 @@ export class AuthService {
       token: this.jwtService.sign({ user }),
     };
   }
-
-  register(createUserDto: CreateUserDto) {
-    // get user from users ms UserMS.createUser(createUserDto)
-  }
 }

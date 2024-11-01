@@ -21,6 +21,8 @@ export class AuthService {
       role: 'ADMIN',
     };
 
+    console.log(user);
+
     return {
       token: this.jwtService.sign({ user }),
     };

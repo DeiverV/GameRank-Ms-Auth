@@ -1,9 +1,9 @@
-import { Controller, UseGuards } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto';
 import { GrpcMethod } from '@nestjs/microservices';
-import { RolesGuard } from './roles.guard';
-import { JwtGuard } from './jwt.guard';
+// import { RolesGuard } from './roles.guard';
+// import { JwtGuard } from './jwt.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -13,7 +13,6 @@ export class AuthController {
   //---------- gRPC Communication
 
   @GrpcMethod('AuthService', 'ValidateToken')
-  @UseGuards(JwtGuard, RolesGuard)
   validateToken({ token }: { token: string }) {
     return this.authService.validateToken({ token });
   }

@@ -1,30 +1,60 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { CreateUserDto, LoginDto } from './dto';
-import { JwtSignature } from './models';
+import { LoginDto, TokenDto } from './dto';
+import { JwtSignature, Role } from './models';
+import { createClient, RedisClientType } from 'redis';
+import { ConfigService } from '@nestjs/config';
+import { ClientGrpc } from '@nestjs/microservices';
+import { UsersService } from './interfaces/user.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly jwtService: JwtService) {}
+  private redisClient: RedisClientType;
+  private usersService: UsersService;
 
-  validateToken({ token }: { token: string }) {
-    return this.jwtService.verify(token);
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
+    @Inject('USERS_PACKAGE') private readonly grpcClient: ClientGrpc,
+  ) {}
+
+  onModuleInit() {
+    this.redisClient = createClient({
+      url: `redis://${this.configService.get('REDIS_HOST')}:${this.configService.get('REDIS_PORT')}`,
+    });
+
+    this.redisClient.connect();
+
+    this.usersService =
+      this.grpcClient.getService<UsersService>('UsersService');
   }
 
-  login({ password, username }: LoginDto) {
-    // get user from users ms
-    const user: JwtSignature = {
-      id: '1f8a4f72-6e9f-42bf-a517-c68c4adfa4c8',
-      name: 'John Doe',
-      username: 'johndoe123',
-      email: 'johndoe@example.com',
-      role: 'ADMIN',
+  async validateToken({ token }: { token: string }) {
+    const res = await this.redisClient.get(token);
+    return res;
+  }
+
+  async login({ password, email }: LoginDto) {
+    const user = await this.usersService.validateUser({ password, email });
+
+    const userSign: JwtSignature = {
+      id: user.id,
+      name: user.name,
+      username: user.username,
+      email: user.email,
+      role: user.role as Role,
     };
 
-    console.log(user);
+    const token = this.jwtService.sign({ userSign });
 
-    return {
-      token: this.jwtService.sign({ user }),
-    };
+    await this.redisClient.set(token, user.role, {
+      EX: this.configService.get('JWT_EXPIRES_IN'),
+    });
+
+    return { token };
+  }
+
+  async logout({ token }: TokenDto) {
+    return await this.redisClient.del(token);
   }
 }

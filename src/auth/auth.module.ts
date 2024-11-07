@@ -4,6 +4,8 @@ import { AuthService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
+import { ClientsModule } from '@nestjs/microservices';
+import { grpcClientOptions } from 'src/grpc-options-users';
 
 @Module({
   imports: [
@@ -12,6 +14,12 @@ import { JwtStrategy } from './jwt.strategy';
       secretOrPrivateKey: process.env.JWT_SECRET || 'secret',
     }),
     PassportModule,
+    ClientsModule.register([
+      {
+        name: 'USERS_PACKAGE',
+        ...grpcClientOptions,
+      },
+    ]),
   ],
   controllers: [AuthController],
   providers: [JwtStrategy, AuthService],

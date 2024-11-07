@@ -5,6 +5,7 @@ package auth;
 service AuthService {
     rpc ValidateToken (Token) returns (Empty);
     rpc Login (LoginDto) returns (Token);
+    rpc Logout (Token) returns (Empty);
 }
 
 message LoginDto {

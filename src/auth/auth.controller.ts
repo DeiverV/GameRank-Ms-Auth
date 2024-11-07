@@ -1,6 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDto } from './dto';
+import { LoginDto, TokenDto } from './dto';
 import { GrpcMethod } from '@nestjs/microservices';
 // import { RolesGuard } from './roles.guard';
 // import { JwtGuard } from './jwt.guard';
@@ -13,12 +13,19 @@ export class AuthController {
   //---------- gRPC Communication
 
   @GrpcMethod('AuthService', 'ValidateToken')
-  validateToken({ token }: { token: string }) {
-    return this.authService.validateToken({ token });
+  async validateToken({ token }: TokenDto) {
+    const res = await this.authService.validateToken({ token });
+    return res;
   }
 
   @GrpcMethod('AuthService', 'Login')
-  login(loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+  async login(loginDto: LoginDto) {
+    const res = await this.authService.login(loginDto);
+    return res;
+  }
+
+  @GrpcMethod('AuthService', 'Logout')
+  async logout(token: TokenDto) {
+    await this.authService.logout(token);
   }
 }

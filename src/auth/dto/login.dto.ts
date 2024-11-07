@@ -1,4 +1,8 @@
 export class LoginDto {
-  username: string;
+  email: string;
   password: string;
+}
+
+export class TokenDto {
+  token: string;
 }
